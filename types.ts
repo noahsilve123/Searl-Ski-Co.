@@ -31,10 +31,6 @@ export interface SkiConfig {
     // New Material System
     topFinish: 'glossy' | 'matte' | 'satin' | 'metal';
     topPattern: 'solid' | 'carbon' | 'wood' | 'geometric' | 'camo' | 'splatter' | 'linear-fade' | 'topo-map';
-    
-    // Frontier Peaks Luxury System
-    textureId?: string; // Filename in public/textures
-    modelName?: string; // AI Generated Name
 }
 
 export const INITIAL_CONFIG: SkiConfig = {
@@ -46,19 +42,19 @@ export const INITIAL_CONFIG: SkiConfig = {
     camberProfile: 'hybrid',
     tailShape: 'partial',
     tipShape: 'rounded',
-    topColor: '#f8fafc', // White
-    sidewallColor: '#2563eb', // Blue
-    logoColor: '#0f172a', // Slate 900
-    bindingColor: '#475569', // Slate 600
-    bindingMaterial: 'aluminum',
-    strapColor: '#1e293b', // Slate 800
+    topColor: '#ffffff',
+    sidewallColor: '#3b82f6', // Classic Electric Blue
+    logoColor: '#0f172a',
+    bindingColor: '#1e293b',
+    bindingMaterial: 'plastic',
+    strapColor: '#0f172a',
     strapTexture: 'fabric',
-    text: 'FRONTIER',
+    text: 'SEARL ONE',
     textPosition: 'tail',
     fontStyle: 'bold',
     woodCore: 'maple',
     edgeMaterial: 'steel',
-    topFinish: 'matte',
+    topFinish: 'glossy',
     topPattern: 'solid'
 };
 

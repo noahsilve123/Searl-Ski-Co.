@@ -1,6 +1,5 @@
 import React, { useMemo, useRef, useEffect } from 'react';
 import * as THREE from 'three';
-import { Text, useTexture } from '@react-three/drei';
 import { SkiConfig } from '../types';
 
 interface SkiModelProps {
@@ -563,12 +562,12 @@ export const SkiModel: React.FC<SkiModelProps> = ({ config }) => {
     }, [config]);
 
     const materialProps = useMemo(() => {
-        const base = { color: '#ffffff', envMapIntensity: 1.5 };
+        const base = { color: '#ffffff', envMapIntensity: 1 };
         switch(config.topFinish) {
-            case 'metal': return { ...base, metalness: 1.0, roughness: 0.15, clearcoat: 0.8, clearcoatRoughness: 0.1 };
-            case 'matte': return { ...base, metalness: 0.1, roughness: 0.9, clearcoat: 0.0 };
-            case 'satin': return { ...base, metalness: 0.4, roughness: 0.3, clearcoat: 0.4 };
-            case 'glossy': default: return { ...base, metalness: 0.1, roughness: 0.05, clearcoat: 1.0, clearcoatRoughness: 0.02 };
+            case 'metal': return { ...base, metalness: 1.0, roughness: 0.2, clearcoat: 0.5 };
+            case 'matte': return { ...base, metalness: 0.0, roughness: 0.8, clearcoat: 0.0 };
+            case 'satin': return { ...base, metalness: 0.3, roughness: 0.4, clearcoat: 0.3 };
+            case 'glossy': default: return { ...base, metalness: 0.0, roughness: 0.1, clearcoat: 1.0, clearcoatRoughness: 0.05 };
         }
     }, [config.topFinish]);
 
@@ -576,46 +575,9 @@ export const SkiModel: React.FC<SkiModelProps> = ({ config }) => {
         switch(config.edgeMaterial) {
             case 'gold': return { color: '#FFD700', metalness: 1.0, roughness: 0.1 };
             case 'black': return { color: '#111111', metalness: 0.5, roughness: 0.4 };
-            case 'steel': default: return { color: '#E5E7EB', metalness: 0.9, roughness: 0.1 };
+            case 'steel': default: return { color: '#C0C0C0', metalness: 0.9, roughness: 0.2 };
         }
     }, [config.edgeMaterial]);
-
-    // --- Texture Components (Split to avoid Hook errors) ---
-    const SnowTexture = () => {
-         const [colorMap, normalMap, roughnessMap] = useTexture([
-            '/textures/snow_color.jpg',
-            '/textures/snow_normal.jpg',
-            '/textures/snow_rough.jpg'
-         ]);
-         
-         useMemo(() => {
-             [colorMap, normalMap, roughnessMap].forEach(t => {
-                 t.wrapS = t.wrapT = THREE.RepeatWrapping;
-                 t.repeat.set(4, 16); 
-             });
-         }, [colorMap, normalMap, roughnessMap]);
-
-         return (
-            <>
-                <primitive attach="map" object={colorMap} />
-                <primitive attach="normalMap" object={normalMap} />
-                <primitive attach="roughnessMap" object={roughnessMap} />
-            </>
-         );
-    };
-
-    const ImageTexture = ({ id }: { id: string }) => {
-        const tex = useTexture(`/textures/${id}`);
-        useMemo(() => {
-            tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-            tex.repeat.set(4, 16);
-        }, [tex]);
-        return <primitive attach="map" object={tex} />;
-    };
-
-    const CanvasTexture = () => (
-        <canvasTexture ref={textureRef} attach="map" args={[canvasRef.current]} anisotropy={16} />
-    );
 
     return (
         <group ref={meshRef}>
@@ -623,48 +585,11 @@ export const SkiModel: React.FC<SkiModelProps> = ({ config }) => {
                 <meshStandardMaterial {...edgeMaterialProps} />
             </mesh>
             <mesh geometry={coreGeometry} castShadow receiveShadow>
-                <meshStandardMaterial attach="material-1" color={config.sidewallColor} roughness={0.5} />
+                <meshStandardMaterial attach="material-1" color={config.sidewallColor} roughness={0.8} />
                 <meshPhysicalMaterial attach="material-0" {...materialProps}>
-                    {!config.textureId ? (
-                        <CanvasTexture />
-                    ) : config.textureId.includes('snow') ? (
-                        <SnowTexture />
-                    ) : (
-                        <ImageTexture id={config.textureId} />
-                    )}
+                    <canvasTexture ref={textureRef} attach="map" args={[canvasRef.current]} anisotropy={16} />
                 </meshPhysicalMaterial>
             </mesh>
-            
-            {/* Luxury Branding - Gold Foil Effect */}
-            <Text
-                position={[0, 0.16, 0.6]}
-                rotation={[-Math.PI / 2, 0, 0]}
-                fontSize={0.12}
-                color={config.logoColor}
-                font="https://fonts.gstatic.com/s/playfairdisplay/v30/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKdFvXDXbtM.woff2"
-                anchorX="center"
-                anchorY="middle"
-                material-toneMapped={false}
-            >
-                FRONTIER PEAKS
-            </Text>
-
-            {/* Model Name */}
-            {config.modelName && (
-                <Text
-                    position={[0, 0.16, -0.6]}
-                    rotation={[-Math.PI / 2, 0, Math.PI]}
-                    fontSize={0.06}
-                    color={config.logoColor}
-                    font="https://fonts.gstatic.com/s/lato/v24/S6uyw4BMUTPHjx4wXg.woff2"
-                    anchorX="center"
-                    anchorY="middle"
-                    letterSpacing={0.2}
-                >
-                    {config.modelName.toUpperCase()}
-                </Text>
-            )}
-
             <Bindings config={config} />
         </group>
     );
